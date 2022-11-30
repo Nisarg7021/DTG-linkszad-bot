@@ -16,6 +16,7 @@ API_ID = int(os.environ.get("API_ID")) #API ID from https://my.telegram.org/auth
 API_HASH = os.environ.get("API_HASH") #API Hash from https://my.telegram.org/auth
 BOT_TOKEN = os.environ.get("BOT_TOKEN") # Bot token from @BotFather
 ADMINS = [int(i.strip()) for i in os.environ.get("ADMINS").split(",")] if os.environ.get("ADMINS") else []
+PORT = os.environ.get("PORT", "8080")
 
 DATABASE_NAME = os.environ.get("DATABASE_NAME", "MdiskConvertor")
 DATABASE_URL = os.environ.get("DATABASE_URL", None) # mongodb uri from https://www.mongodb.com/
