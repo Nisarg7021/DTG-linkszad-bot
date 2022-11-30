@@ -1,3 +1,6 @@
+from aiohttp import web
+from plugins import web_server
+
 import asyncio
 import datetime
 import logging
@@ -78,6 +81,10 @@ class Bot(Client):
         me = await self.get_me()
         self.owner = await self.get_users(int(OWNER_ID))
         self.username = f'@{me.username}'
+        app = web.AppRunner(await web_server())
+        await app.setup()
+        bind_address = "0.0.0.0"
+        await web.TCPSite(app, bind_address, PORT).start()
         temp.BOT_USERNAME = me.username
         temp.FIRST_NAME = me.first_name
         if not await db.get_bot_stats():
