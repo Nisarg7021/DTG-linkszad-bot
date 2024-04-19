@@ -131,39 +131,8 @@ async def on_callback_query(bot: Client, query: CallbackQuery):
 
         await query.message.edit(tit, reply_markup=START_MESSAGE_REPLY_MARKUP, disable_web_page_preview=True)
 
-    elif query.data.startswith('change_method'):
-        method_name = query.data.split('#')[1]
-        user = temp.BOT_USERNAME
-        await update_user_info(user_id, {"method": method_name})
-        REPLY_MARKUP = InlineKeyboardMarkup([[InlineKeyboardButton('Back', callback_data='method_command')]])
-
-        await query.message.edit("Method changed successfully to `{method}`".format(method=method_name, username=user), reply_markup=REPLY_MARKUP)
-
-    elif query.data == 'method_command':
-        s = METHOD_MESSAGE.format(method=user["method"], shortener=user["base_site"])
-        return await query.message.edit(s, reply_markup=METHOD_REPLY_MARKUP)
-    elif query.data == 'cbatch_command':
-        if user_id not in ADMINS:
-            return await query.message.edit("Get Out From This Command Only My Hubby Can Use This Command", reply_markup=BACK_REPLY_MARKUP)
-
-        await query.message.edit(BATCH_MESSAGE, reply_markup=BACK_REPLY_MARKUP)
-    elif query.data == 'alias_conf':
-        await query.message.edit(CUSTOM_ALIAS_MESSAGE, reply_markup=BACK_REPLY_MARKUP, disable_web_page_preview=True)
-
-    elif query.data == 'admins_list':
-        if user_id not in ADMINS:
-            return await query.message.edit("What The Hell! Who Are You??", reply_markup=BACK_REPLY_MARKUP)
-
-        await query.message.edit(ADMINS_MESSAGE.format(admin_list=await h.get_admins), reply_markup=BACK_REPLY_MARKUP)
-
-    elif query.data == 'channels_list':
-        if user_id not in ADMINS:
-            return await query.message.edit("Works only for admins", reply_markup=BACK_REPLY_MARKUP)
-
-        await query.message.edit(CHANNELS_LIST_MESSAGE.format(channels=await h.get_channels), reply_markup=BACK_REPLY_MARKUP)
-
     elif query.data == 'restart':
         await query.message.edit('**Restarting.....**')
         await asyncio.sleep(5)
-        os.execl(sys.executable, sys.executable, *sys.argv)
+        os.execl(sys.executable, sys.executable, sys.argv)
     await query.answer()
