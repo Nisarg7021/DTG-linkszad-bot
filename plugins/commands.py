@@ -2,28 +2,24 @@ import contextlib
 import datetime
 import logging
 
-from validators import domain
-from config import (ADMINS, HEROKU, HEROKU_API_KEY, HEROKU_APP_NAME,
-                    IS_PRIVATE, LOG_CHANNEL, SOURCE_CODE, WELCOME_IMAGE)
-from database import db
-from database.users import (get_user, is_user_exist,
-                            total_users_count, update_user_info)
-from helpers import temp
-from pyrogram import Client, filters
-from pyrogram.types import Message
-from plugins.filters import private_use
+from validators import *
+from config import *
+from database import *
+from database.users import *
+from helpers import *
+from pyrogram import *
+from pyrogram.types import *
 from translation import *
-from utils import extract_link, get_me_button, get_size, getHerokuDetails
+from bot import *
 
 logger = logging.getLogger(__name__)
 
 user_commands = ["set_api", "header", "footer", "username", "banner_image", "me"]
-avl_web = ["dtglinks.in",]
+avl_web = ["Dtglinks.in",]
 
 avl_web1 = "".join(f"- {i}\n" for i in avl_web)
 
 @Client.on_message(filters.command('start') & filters.private & filters.incoming)
-@private_use
 async def start(c:Client, m:Message):
     NEW_USER_REPLY_MARKUP = [
                 [
@@ -45,13 +41,10 @@ async def start(c:Client, m:Message):
 
 
 @Client.on_message(filters.command('help') & filters.private)
-@private_use
 async def help_command(c, m: Message):
     s = HELP_MESSAGE.format(
                 firstname=temp.FIRST_NAME,
-                username=temp.BOT_USERNAME,
-                repo=SOURCE_CODE,
-                owner="@ask_admin001" )
+                username=temp.BOT_USERNAME)
 
     if WELCOME_IMAGE:
         return await m.reply_photo(photo=WELCOME_IMAGE, caption=s, reply_markup=HELP_REPLY_MARKUP)
@@ -59,7 +52,6 @@ async def help_command(c, m: Message):
 
 
 @Client.on_message(filters.command('about'))
-@private_use
 async def about_command(c, m: Message):
     reply_markup=ABOUT_REPLY_MARKUP
 
@@ -69,63 +61,7 @@ async def about_command(c, m: Message):
     await m.reply_text(ABOUT_TEXT.format(bot.mention(style='md')),reply_markup=reply_markup , disable_web_page_preview=True)
 
 
-
-@Client.on_message(filters.command('restart') & filters.user(ADMINS) & filters.private)
-@private_use
-async def restart_handler(c: Client, m: Message):
-    RESTARTE_MARKUP = InlineKeyboardMarkup([[InlineKeyboardButton('Sure', callback_data='restart'), InlineKeyboardButton('Disable', callback_data='delete')]])
-    await m.reply("Are you sure you want to restart / re-deploy the server?", reply_markup=RESTARTE_MARKUP)
-
-
-@Client.on_message(filters.command('stats') & filters.private)
-@private_use
-async def stats_handler(c: Client, m:Message):
-    try:
-        txt = await m.reply('`Fetching stats...`')
-        size = await db.get_db_size()
-        free = 536870912 - size
-        size = await get_size(size)
-        free = await get_size(free)
-        link_stats = await db.get_bot_stats()
-        runtime = datetime.datetime.now()
-
-        t = runtime - temp.START_TIME
-        runtime = str(datetime.timedelta(seconds=t.seconds))
-        total_users = await total_users_count()
-
-        msg = f"""
-**- Total Users:** `{total_users}`
-**- Total Posts Sent:** `{link_stats['posts']}`
-**- Total Links Shortened:** `{link_stats['links']}`
-**- Total Mdisk Links Shortened:** `{link_stats['mdisk_links']}`
-**- Total Shortener Links Shortened:** `{link_stats['shortener_links']}`
-**- Used Storage:** `{size}`
-**- Total Free Storage:** `{free}`
-
-**- Runtime:** `{runtime}`
-    """
-        if HEROKU and m.from_user.id in ADMINS:
-            heroku = await getHerokuDetails(HEROKU_API_KEY, HEROKU_APP_NAME)
-            msg += f"\n- **Heroku Stats:**\n{heroku}"
-
-        return await txt.edit(msg)
-    except Exception as e:
-        logging.error(e, exc_info=True)
-
-
-@Client.on_message(filters.command('logs') & filters.user(ADMINS) & filters.private)
-@private_use
-async def log_file(bot, message):
-    """Send log file"""
-    try:
-        await message.reply_document('TelegramBot.log')
-    except Exception as e:
-        await message.reply(str(e))
-
-
-
 @Client.on_message(filters.command('set_api') & filters.private)
-@private_use
 async def shortener_api_handler(bot, m: Message):
     user_id = m.from_user.id
     user = await get_user(user_id)
@@ -140,7 +76,6 @@ async def shortener_api_handler(bot, m: Message):
         await m.reply(f"Shortener API updated successfully to {api}")
 
 @Client.on_message(filters.command('header') & filters.private)
-@private_use
 async def header_handler(bot, m: Message):
     user_id = m.from_user.id
     cmd = m.command
@@ -156,7 +91,6 @@ async def header_handler(bot, m: Message):
         return await m.reply(HEADER_MESSAGE + "\n\nCurrent Header Text: " + user["header_text"].replace("\n", "\n"))
 
 @Client.on_message(filters.command('footer') & filters.private)
-@private_use
 async def footer_handler(bot, m: Message):
     user_id = m.from_user.id
     cmd = m.command
@@ -173,7 +107,6 @@ async def footer_handler(bot, m: Message):
         await m.reply("Footer Text Updated Successfully")
 
 @Client.on_message(filters.command('username') & filters.private)
-@private_use
 async def username_handler(bot, m: Message):
     user_id = m.from_user.id
     user = await get_user(user_id)
@@ -192,7 +125,6 @@ async def username_handler(bot, m: Message):
 
 
 @Client.on_message(filters.command('banner_image') & filters.private)
-@private_use
 async def banner_image_handler(bot, m: Message):
     user_id = m.from_user.id
     user = await get_user(user_id)
@@ -219,10 +151,7 @@ async def banner_image_handler(bot, m: Message):
                 return await m.reply_text("Image URL is Invalid")
 
 
-
-
 @Client.on_message(filters.command('me') & filters.private)
-@private_use
 async def me_handler(bot, m:Message):
     user_id = m.from_user.id
     user = await get_user(user_id)
@@ -233,6 +162,7 @@ async def me_handler(bot, m:Message):
                 base_site=user["base_site"], 
                 method=user["method"], 
                 shortener_api=user["shortener_api"], 
+                mdisk_api=user["mdisk_api"],
                 username=user["username"],
                 header_text=user["header_text"].replace(r'\n', '\n') if user["header_text"] else None,
                 footer_text=user["footer_text"].replace(r'\n', '\n') if user["footer_text"] else None,
@@ -243,80 +173,9 @@ async def me_handler(bot, m:Message):
     return await m.reply_text(res, reply_markup=reply_markup, disable_web_page_preview=True)
 
 
-#  Todo
-@Client.on_message(filters.command('include_domain') & filters.private)
-@private_use
-async def include_domain_handler(bot, m: Message):
-    user = await get_user(m.from_user.id)
-    inc_domain = user["include_domain"]
-    tdl = ""
-    if inc_domain:
-        for i in inc_domain:
-            tdl += f"- `{i}`\n"
-    else:
-        tdl = "None\n"
-    if len(m.command) == 1:
-        return await m.reply(INCLUDE_DOMAIN_TEXT.format(tdl))
-    try:
-        cmd = m.command
-        cmd.remove('include_domain')
-        if "remove_all" in cmd:
-            domain_list = []
-        elif "remove" in cmd:
-            cmd.remove('remove')
-            domain_list_cmd = "".join(cmd).strip().split(",")
-            for i in list(domain_list_cmd):
-                with contextlib.suppress(Exception):
-                    inc_domain.remove(i)
-            domain_list = list(set(list(inc_domain)))
-        else:
-            domain_list_cmd = "".join(cmd).strip().split(",")
-            domain_list = list(set(domain_list_cmd + list(inc_domain)))
-        x = await update_user_info(m.from_user.id, {"include_domain": domain_list})
-        return await m.reply("Updated include domain list successfully")
-    except Exception as e:
-        logging.exception(e, exc_info=True)
-        return await m.reply("Some error updating include domain list")
-
-
-@Client.on_message(filters.command('exclude_domain') & filters.private)
-@private_use
-async def exclude_domain_handler(bot, m: Message):
-    user = await get_user(m.from_user.id)
-    ex_domain = user["exclude_domain"]
-    tdl = ""
-    if ex_domain:
-        for i in ex_domain:
-            tdl += f"- `{i}`\n"
-    else:
-        tdl = "None\n"
-    if len(m.command) == 1:
-        return await m.reply(EXCLUDE_DOMAIN_TEXT.format(tdl))
-    try:
-        cmd = m.command
-        cmd.remove('exclude_domain')
-        if "remove_all" in cmd:
-            domain_list = []
-        elif "remove" in cmd:
-            cmd.remove('remove')
-            domain_list_cmd = "".join(cmd).strip().split(",")
-            for i in list(domain_list_cmd):
-                with contextlib.suppress(Exception):
-                    ex_domain.remove(i)
-
-            domain_list = list(set(list(ex_domain)))
-        else:
-            domain_list_cmd = "".join(cmd).strip().split(",")
-            domain_list = list(set(domain_list_cmd + list(ex_domain)))
-        x = await update_user_info(m.from_user.id, {"exclude_domain": domain_list})
-        return await m.reply("Updated exclude domain list successfully")
-    except Exception as e:
-        logging.exception(e, exc_info=True)
-        return await m.reply("Some error updating exclude domain list")
 
 
 @Client.on_message(filters.command('ban') & filters.private & filters.user(ADMINS))
-@private_use
 async def banned_user_handler(c: Client, m: Message):
     try:
         if len(m.command) == 1:
@@ -342,7 +201,6 @@ async def banned_user_handler(c: Client, m: Message):
         logging.exception(e, exc_info=True)
 
 @Client.on_message(filters.command('unban') & filters.private & filters.user(ADMINS))
-@private_use
 async def unban_user_handler(c: Client, m: Message):
     try:
         if len(m.command) == 1:
@@ -367,23 +225,3 @@ async def unban_user_handler(c: Client, m: Message):
                 await m.reply("User doesn't exist")
     except Exception as e:
         logging.exception(e, exc_info=True)
-
-
-@Client.on_message(filters.command('info') & filters.private & filters.user(ADMINS))
-@private_use
-async def get_user_info_handler(c: Client, m: Message):
-    try:
-        if len(m.command) != 2:
-            return await m.reply_text("Wrong Input!!\n`/info user_id`")
-        user = await get_user(int(m.command[1]))
-        if not user:
-            return await m.reply_text("User doesn't exist")
-        res = USER_ABOUT_MESSAGE.format(base_site=user["base_site"], method=user["method"], shortener_api='This is something secret', mdisk_api='This is something secret', username=user["username"], header_text=user["header_text"].replace('\n', '\n') if user["header_text"] else None, footer_text=user["footer_text"].replace('\n', '\n') if user["footer_text"] else None, banner_image=user["banner_image"])
-
-        res = f'User: `{user["user_id"]}`\n{res}'
-        reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('Ban', callback_data=f'ban#{user["user_id"]}'), InlineKeyboardButton('Close', callback_data='delete')]])
-
-        return await m.reply_text(res, reply_markup=reply_markup, quote=True)
-    except Exception as e:
-        await m.reply_text(e)
-        logging.error(e)
