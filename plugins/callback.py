@@ -13,11 +13,7 @@ from pyrogram import Client, filters
 from pyrogram.errors import UserNotParticipant
 from pyrogram.types import (CallbackQuery, InlineKeyboardButton,
                             InlineKeyboardMarkup)
-from translation import (ABOUT_REPLY_MARKUP, ABOUT_TEXT, ADMINS_MESSAGE,
-                         BACK_REPLY_MARKUP, BATCH_MESSAGE,
-                         CHANNELS_LIST_MESSAGE, CUSTOM_ALIAS_MESSAGE,
-                         HELP_MESSAGE, HELP_REPLY_MARKUP, START_MESSAGE,
-                         START_MESSAGE_REPLY_MARKUP)
+from translation import *
 from utils import get_me_button
 
 logger = logging.getLogger(__name__)
