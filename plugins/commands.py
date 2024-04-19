@@ -17,7 +17,7 @@ from utils import extract_link, get_me_button, get_size, getHerokuDetails
 
 logger = logging.getLogger(__name__)
 
-user_commands = ["mdisk_api", "shortener_api", "header", "footer", "username", "banner_image", "me"]
+user_commands = ["set_api", "header", "footer", "username", "banner_image", "me"]
 avl_web = ["dtglinks.in",]
 
 avl_web1 = "".join(f"- {i}\n" for i in avl_web)
@@ -69,21 +69,6 @@ async def about_command(c, m: Message):
     await m.reply_text(ABOUT_TEXT.format(bot.mention(style='md')),reply_markup=reply_markup , disable_web_page_preview=True)
 
 
-@Client.on_message(filters.command('method') & filters.private)
-@private_use
-async def method_handler(c: Client, m: Message):
-    user_id = m.from_user.id
-    user = await get_user(user_id)
-    cmd = m.command
-    if len(cmd) == 1:
-        s = METHOD_MESSAGE.format(method=user["method"], shortener=user["base_site"])
-        return await m.reply(s, reply_markup=METHOD_REPLY_MARKUP)
-    elif len(cmd) == 2:
-        method = cmd[1]
-        if method not in ["mdisk", "mdlink", "shortener"]:
-            return await m.reply(METHOD_MESSAGE.format(method=user["method"]))
-        await update_user_info(user_id, {"method": method})
-        await m.reply(f"Method updated successfully to {method}")
 
 @Client.on_message(filters.command('restart') & filters.user(ADMINS) & filters.private)
 @private_use
@@ -137,20 +122,9 @@ async def log_file(bot, message):
     except Exception as e:
         await message.reply(str(e))
 
-@Client.on_message(filters.command('mdisk_api') & filters.private)
-@private_use
-async def mdisk_api_handler(bot, message: Message):
-    user_id = message.from_user.id
-    user = await get_user(user_id)
-    cmd = message.command
-    if len(cmd) == 1:
-        return await message.reply(MDISK_API_MESSAGE.format(user["mdisk_api"]))
-    elif len(cmd) == 2:
-        api = cmd[1].strip()
-        await update_user_info(user_id, {"mdisk_api": api})
-        await message.reply(f"Mdisk API updated successfully to {api}")
 
-@Client.on_message(filters.command('shortener_api') & filters.private)
+
+@Client.on_message(filters.command('set_api') & filters.private)
 @private_use
 async def shortener_api_handler(bot, m: Message):
     user_id = m.from_user.id
@@ -259,7 +233,6 @@ async def me_handler(bot, m:Message):
                 base_site=user["base_site"], 
                 method=user["method"], 
                 shortener_api=user["shortener_api"], 
-                mdisk_api=user["mdisk_api"],
                 username=user["username"],
                 header_text=user["header_text"].replace(r'\n', '\n') if user["header_text"] else None,
                 footer_text=user["footer_text"].replace(r'\n', '\n') if user["footer_text"] else None,
