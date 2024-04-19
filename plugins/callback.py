@@ -5,15 +5,15 @@ import os
 import re
 import sys
 
-from config import ADMINS, OWNER_ID, SOURCE_CODE, UPDATE_CHANNEL
-from database import update_user_info
-from database.users import get_user
-from helpers import Helpers, temp
-from pyrogram import Client, filters
-from pyrogram.errors import UserNotParticipant
-from pyrogram.types import (CallbackQuery, InlineKeyboardButton,
-                            InlineKeyboardMarkup)
+from config import *
+from database import *
+from database.users import *
+from helpers import *
+from pyrogram import *
+from pyrogram.errors import *
+from pyrogram.types import *
 from translation import *
+from bot import *
 from utils import get_me_button
 
 logger = logging.getLogger(__name__)
