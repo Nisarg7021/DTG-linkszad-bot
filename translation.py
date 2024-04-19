@@ -11,29 +11,47 @@ Command usage: `/batch [channel id or username]`
 Ex: `/batch -100xxx`
 """
 
-START_MESSAGE = '''Hello, {}
+START_MESSAGE ='''**Hello, {}
+I Am Greylinks Official Link Converter. I Can Convert Links Directly From Your GreyMatterslinks.in Account,
+    
+1. Go To 👉 https://DTGLINKS.IN/member/tools/api 
 
-I'm a DTGLINKS.IN Shortener Bot short Using your API. 
+2. Than Copy API Key
 
-Just Send me Any Post with Mdisk or Other Links. I will Convert Those Links Using Your API and Send them Back To You. I work in Channels too. 
+3. Than Type /set_api than give a single space and than paste your API Key (see example to understand more...)
 
-Hit /help for more information about this Bot
+/set_api(space)API Key 
+(See Example.👇)
+Example:** `/set_api 133fvnc53fjcfhdr5d665661fhg02315chj`
 
-Current Method Selected: **{}**
+**💁‍♀️ Hit 👉 /help To Get Help.
 
+➕ Hit 👉 /footer To Get Help About Adding your Custom Footer to bot.
+
+➕ Hit 👉 /header To Get Help About Adding your Custom Footer to bot.**
 '''
 
 
 HELP_MESSAGE = '''
-Hey! My name is {firstname}. I am a DTGLINKS.IN Shortner bot make your Work Easy and Help you to Earn more
+**Hey! My name is {firstname}. I am a DTGLINKS Pro Shortener Bot.**
+
+Features 
+
+- [Hyperlink](https://t.me/{username})
+- Buttons convert support
+- Header and Footer Text support
+- Replace Username
+- Banner Image
 
 Helpful commands:
 
 - /start: Starts me! You've probably already used this.
 - /help: Sends this message; I'll tell you more about myself!
-- /batch -100xxx: To short or convert all posts of your channel
-- /shortener_api
-- /mdisk_api
+If You Have Any Problem Then contact us at - 
+
+Available commands:
+
+- /set_api
 - /header
 - /footer
 - /username
@@ -41,24 +59,19 @@ Helpful commands:
 - /me
 
 Use the commands to know more about the same
-
 Below are some features I provide'''
 
-
-ABOUT_TEXT = """
+ABOUT_TEXT =  """
 **My Details:**
+`🤖 Name:` ** {} **
+    
+`📝 Language:` [Python 3](https://www.python.org/)
 
-I have lots of features, such as 
+`🧰 Framework:` [Pyrogram](https://github.com/pyrogram/pyrogram)
 
-- Include domains 
-- Exclude domains
-- Header and Footer Text support
-- Replace Username
-- Banner Image
-- Buttons convert support
-- Batch convert (Admin Only Use)
-- Channel Support (Admin Only Use)
-- Convert forwarded posts (Admin Only Use)
+`👨‍💻 Developer:` [GreyMatter's](https://t.me/GreyMattersTech)
+
+`📢 Support:`   [SUPPORT](mailto:contact@GreyMattersTech.com)
 
 """
 
@@ -96,22 +109,13 @@ List of channels that have access to this Bot:
 
 
 HELP_REPLY_MARKUP = InlineKeyboardMarkup([
-    [
-        InlineKeyboardButton('Methods', callback_data=f'method_command'),
-        InlineKeyboardButton('Batch', callback_data=f'cbatch_command'),
-        
-    ],
-
+   
     [
         InlineKeyboardButton('Custom Alias', callback_data=f'alias_conf'),
-        InlineKeyboardButton('Admins', callback_data=f'admins_list'),    
     ],
 
     [
-        
-        InlineKeyboardButton('Channels', callback_data=f'channels_list'),
-        InlineKeyboardButton('Home', callback_data='start_command')
-        
+        InlineKeyboardButton('Home', callback_data='start_command')        
     ],
 
 
@@ -134,24 +138,11 @@ START_MESSAGE_REPLY_MARKUP  = InlineKeyboardMarkup([
         InlineKeyboardButton('About', callback_data='about_command')
     ],
         [
-        InlineKeyboardButton('Method', callback_data=f'method_command'),
         InlineKeyboardButton('Close', callback_data='delete')
     ],
 
 ])
 
-METHOD_REPLY_MARKUP = InlineKeyboardMarkup([
-    [
-        InlineKeyboardButton('MDLINK', callback_data=f'change_method#mdlink'),
-        InlineKeyboardButton('Shortener', callback_data='change_method#shortener'),
-        InlineKeyboardButton("Mdisk", callback_data="change_method#mdisk"),
-    ],
-        [
-        InlineKeyboardButton('Back', callback_data=f'help_command'),
-        InlineKeyboardButton('Close', callback_data='delete')
-    ],
-
-])
 
 BACK_REPLY_MARKUP = InlineKeyboardMarkup([
     [
@@ -161,11 +152,12 @@ BACK_REPLY_MARKUP = InlineKeyboardMarkup([
 ])
 
 USER_ABOUT_MESSAGE = """
-- Shortener Website: DTGLINKS.IN
-- Method: {method}
-- DTGLINKS.IN API: {shortener_api}
-- Mdisk API: {mdisk_api}
+- Website: [{base_site}](https://dtglinks.in)
+
+- {base_site} API: {shortener_api}
+
 - Username: @{username}
+
 - Header Text: 
 {header_text}
 
@@ -175,16 +167,6 @@ USER_ABOUT_MESSAGE = """
 - Banner Image: {banner_image}
 """
 
-
-MDISK_API_MESSAGE = """To add or update your Mdisk API, \n`/mdisk_api mdisk_api`
-            
-Ex: `/mdisk_api 6LZq851sXoPHugiKQq`
-            
-Others Mdisk Links will be automatically changed to the API of this Mdisk account
-
-Get your Mdisk API from @VideoToolMoneyTreebot
-
-Current Mdisk API: `{}`"""
 
 SHORTENER_API_MESSAGE = """To add or update your Shortner Website API, 
 `/shortener_api [api]`
